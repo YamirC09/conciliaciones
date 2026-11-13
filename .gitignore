@@ -1,0 +1,15 @@
+# Datos reales: nunca entran al repositorio
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+salida/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Variables de entorno
+.env
