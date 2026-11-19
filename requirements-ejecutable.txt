@@ -1,0 +1,2 @@
+# Solo para generar el ejecutable; no hace falta para usar el programa.
+pyinstaller==6.11.1

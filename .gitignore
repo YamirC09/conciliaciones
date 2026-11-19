@@ -11,5 +11,10 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
+# Archivos que genera PyInstaller al armar el ejecutable
+build/
+dist/
+*.spec
+
 # Variables de entorno
 .env

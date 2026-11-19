@@ -21,6 +21,7 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 
+from conciliacion import __version__
 from conciliacion.__main__ import SalidaExistente, conciliar
 from conciliacion.escritura import COLOR_DUDOSA, COLOR_REPETIDA, COLOR_SEGURA
 from conciliacion.lectura import ArchivoInvalido
@@ -113,7 +114,7 @@ class Ventana:
         self.resultados = queue.Queue()
         self.carpeta_resultado = None
 
-        raiz.title("Conciliación bancaria")
+        raiz.title(f"Conciliación bancaria {__version__}")
         raiz.minsize(560, 0)
         marco = ttk.Frame(raiz, padding=16)
         marco.grid(sticky="nsew")

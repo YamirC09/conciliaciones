@@ -1,0 +1,80 @@
+# Genera los ejecutables de Windows y Mac, y los publica como una versión.
+#
+# Se activa al subir una etiqueta que empiece por "v", por ejemplo:
+#   git tag -a v0.2.0 -m "Versión 0.2.0: ..."
+#   git push origin v0.2.0
+#
+# También se puede correr a mano desde la pestaña Actions de GitHub (botón
+# "Run workflow"): en ese caso genera los ejecutables, pero no publica nada.
+
+name: Ejecutable
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  construir:
+    name: Construir (${{ matrix.sistema }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sistema: Windows
+            maquina: windows-latest
+          - sistema: Mac
+            maquina: macos-latest
+    runs-on: ${{ matrix.maquina }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements.txt -r requirements-ejecutable.txt
+
+      - name: Correr las pruebas
+        run: python -m pytest tests -q
+
+      - name: Generar el ejecutable de Windows
+        if: matrix.sistema == 'Windows'
+        run: |
+          python -m PyInstaller --noconfirm --onefile --windowed --name Conciliacion abrir_conciliacion.py
+          Compress-Archive -Path dist/Conciliacion.exe -DestinationPath Conciliacion-Windows.zip
+
+      - name: Generar la aplicación de Mac
+        if: matrix.sistema == 'Mac'
+        run: |
+          python -m PyInstaller --noconfirm --windowed --name Conciliacion abrir_conciliacion.py
+          ditto -c -k --keepParent dist/Conciliacion.app Conciliacion-Mac.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Conciliacion-${{ matrix.sistema }}
+          path: Conciliacion-${{ matrix.sistema }}.zip
+
+  publicar:
+    name: Publicar la versión
+    needs: construir
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: Crear la versión con los dos ejecutables
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            Conciliacion-Windows.zip Conciliacion-Mac.zip \
+            --repo "${{ github.repository }}" \
+            --title "Conciliación ${{ github.ref_name }}" \
+            --generate-notes

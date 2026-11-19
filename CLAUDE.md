@@ -134,7 +134,14 @@ Para conciliar con la ventana (la forma pensada para ella):
 .venv/bin/python -m conciliacion.interfaz
 ```
 
-Guarda los resultados en `Conciliaciones/<fecha y hora>/`, junto al extracto elegido, para que cada ejecución quede aparte. En Linux requiere `sudo apt install python3-tk`; en Windows y macOS Tkinter viene con Python. El ejecutable se genera con PyInstaller en el mismo sistema operativo de ella, que aún no se conoce.
+Guarda los resultados en `Conciliaciones/<fecha y hora>/`, junto al extracto elegido, para que cada ejecución quede aparte. En Linux requiere `sudo apt install python3-tk`; en Windows y macOS Tkinter viene con Python.
+
+Ejecutable: `.github/workflows/ejecutable.yml` genera en GitHub los de Windows y Mac al subir una etiqueta `v*`, y los publica en Releases. La versión está en `conciliacion/__init__.py` (`__version__`) y debe coincidir con la etiqueta. Instrucciones para ella en `docs/instrucciones-de-uso.md`. Para probar uno de Linux en local:
+
+```bash
+.venv/bin/python -m pip install -r requirements-ejecutable.txt
+.venv/bin/python -m PyInstaller --noconfirm --onefile --windowed --name Conciliacion abrir_conciliacion.py
+```
 
 Guarda las copias con datos reales fuera del repositorio. Durante el desarrollo se usa `~/Escritorio/conciliacion-salida/`.
 
